@@ -16,6 +16,6 @@ En este repositorio se encuentran todos los scripts empleados para la realizaci�
 
 Además se incluyen como anexo los scripts empleados para el análisis de expresión diferencial de los datos empleados para la realización de este trabajo y la tabla de resultados.
 
-También se añaden la lista de rutas fisiológicas KEGG empleadas para la elaboración del mapa y los datos descargados de DrugBank. 
+También se añaden la lista de rutas fisiológicas KEGG empleadas para la elaboración del mapa (physiological_paths.tsv) y los datos descargados de DrugBank (drugbank_drug-bindings_v5.1.8.tsv). 
 
 Para obtener las matrices de datos empleadas obtenidas de los repositorio GEO y GTEx, en el propio trabajo se indica de donde descargarlas.
