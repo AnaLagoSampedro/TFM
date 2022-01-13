@@ -1,34 +1,34 @@
 ##################################################################
-################## An·lisis DGE de RNA-seq #######################
+################## An√°lisis DGE de RNA-seq #######################
 #################### Proyecto GSE164416 ##########################
 ################# ANA MARIA LAGO SAMPEDRO ########################
 ##################################################################
 
-# Establecer el directorio de trabajo (donde se guardar·n los resultados)
+# Establecer el directorio de trabajo (donde se guardar√°n los resultados)
 setwd('~path/RESULTADOS')
 # Para saber si estamos correctamente en el directorio de trabajo
 getwd()
 
 ## ------------------------------------------------------------------------
-# InstalaciÛn de los paquetes necesarios para este an·lisis
+# Instalaci√≥n de los paquetes necesarios para este an√°lisis
 BiocManager::install("DESeq2")
 
 ## ------------------------------------------------------------------------
-# Cargar las librerÌas
+# Cargar las librer√≠as
 library(DESeq2)
 
 ## ------------------------------------------------------------------------
 # Input de los datos a analizar:
 ## Matriz de conteos sin normalizar:  counts_matrix(T2DvsND).txt
-## Matriz de diseÒo:  design_matrix(T2DvsND).txt 
-#Es necesario crear una matriz con el diseÒo de la matriz de conteos;
-#donde se incluyan mÌnimo dos columnas, la primera con el nombre de cada 
-#muestra y la segunda con la condiciÛn de interÈs para el an·lisis DGE (en 
+## Matriz de dise√±o:  design_matrix(T2DvsND).txt 
+#Es necesario crear una matriz con el dise√±o de la matriz de conteos;
+#donde se incluyan m√≠nimo dos columnas, la primera con el nombre de cada 
+#muestra y la segunda con la condici√≥n de inter√©s para el an√°lisis DGE (en 
 #este caso, presentar la enfermedad DM2 (T2D) o no (ND))
 
 ## ------------------------------------------------------------------------
 # Definir los directorios donde se encuentran la matriz de conteos y la matriz 
-# de diseÒo
+# de dise√±o
 data_folder<-"~path/FILES"
 
 fname<-"counts_matrix(T2DvsND).txt"
@@ -43,7 +43,7 @@ rownames(expreset_raw)<-expreset_raw$ensembl  #Asignar a cada fila el nombre del
 expreset<-expreset_raw[,-1]  #Eliminar la primera columna, para tener una matriz 
 #de conteos exclusivamente
 
-# Leer los datos del diseÒo del experimento
+# Leer los datos del dise√±o del experimento
 matrix_design <- read.table(dpath,header=FALSE,sep="\t")
 head(matrix_design)
 names (matrix_design) = c("ID", "Condition","name")
@@ -57,57 +57,57 @@ matrix_design<-matrix_design[,-1]  #Eliminar la primera columna (OJO que siga
 
 ################################################################################
 
-###### AN¡LISIS DGE #####
+###### AN√ÅLISIS DGE #####
 
-### 1.Filtrar por genes con muy baja expresiÛn en la mayorÌa de muestras:
-#Con la condiciÛn siguiente; que crea una matriz con valores lÛgicos TRUE si la 
-#condiciÛn se cumple y FALSE si no se cumple (condiciÛn valor expresiÛn > 0.5). 
+### 1.Filtrar por genes con muy baja expresi√≥n en la mayor√≠a de muestras:
+#Con la condici√≥n siguiente; que crea una matriz con valores l√≥gicos TRUE si la 
+#condici√≥n se cumple y FALSE si no se cumple (condici√≥n valor expresi√≥n > 0.5). 
 #En general, a los valores TRUE se les asignan unos y a los valores FALSE ceros,
-#por lo que, al calcular la suma por filas con la funciÛn rowSums(∑) lo que se 
+#por lo que, al calcular la suma por filas con la funci√≥n rowSums(¬∑) lo que se 
 #hace realmente es contar cuantos valores positivos se tienen por filas en la 
-#matriz de valores lÛgicos construida anteriormente. Tras hacer esto, sÛlo se 
+#matriz de valores l√≥gicos construida anteriormente. Tras hacer esto, s√≥lo se 
 #mantienen las filas, es decir, los genes, en los que esta suma o recuento es 
-#mayor o igual a 10 (al menos 10 muestras que presentan 5 o m·s conteos).
+#mayor o igual a 10 (al menos 10 muestras que presentan 5 o m√°s conteos).
 filtro <- expreset >=5
 filtered_data <- filtro[rowSums(filtro) >= 10, ]
 dim(filtered_data)
-#Se trabajar· con esta matriz filtrada a partir de ahora.
+#Se trabajar√° con esta matriz filtrada a partir de ahora.
 
-#Genes que permanecen para el an·lisis de expresiÛn diferencial
+#Genes que permanecen para el an√°lisis de expresi√≥n diferencial
 filtrado_genes<-expreset[rownames(filtered_data),]
 dim(filtrado_genes)
 
-### 2.ExpresiÛn diferencial con DESeq2:
-#Modelo probabilÌstico que emplea este paquete es la Binomial negativa y 
-#emplea su propia estrategia de normalizaciÛn. Hace NormalizaciÛn, estimaciÛn 
-#de la dispersiÛn, ajuste de los datos a un modelo lineal generalizado binomial 
-#negativo y comprueba la expresiÛn diferencial mediante test paramÈtrico de Wald.
-#Todo a travÈs de una ˙nica funciÛn DESeq(). Lleva a cabo de manera secuencial 
-#todos los paso para el an·lisis completo de expresiÛn diferencial.
+### 2.Expresi√≥n diferencial con DESeq2:
+#Modelo probabil√≠stico que emplea este paquete es la Binomial negativa y 
+#emplea su propia estrategia de normalizaci√≥n. Hace Normalizaci√≥n, estimaci√≥n 
+#de la dispersi√≥n, ajuste de los datos a un modelo lineal generalizado binomial 
+#negativo y comprueba la expresi√≥n diferencial mediante test param√©trico de Wald.
+#Todo a trav√©s de una √∫nica funci√≥n DESeq(). Lleva a cabo de manera secuencial 
+#todos los paso para el an√°lisis completo de expresi√≥n diferencial.
 
 #Pasos;
-#Crear el objeto de la clase DESeq-DataSet con los datos de conteos y la condiciÛn:
+#Crear el objeto de la clase DESeq-DataSet con los datos de conteos y la condici√≥n:
 de_diabetes<-DESeqDataSetFromMatrix(countData = filtrado_genes, 
                                     colData = matrix_design, 
                                     design = ~Condition)
 
-#An·lisis de expresiÛn diferencial
+#An√°lisis de expresi√≥n diferencial
 de_fit<-DESeq(de_diabetes)
 
-#Visualizar resultados a travÈs de la funciÛn results()
+#Visualizar resultados a trav√©s de la funci√≥n results()
 res_diabetes<-results(de_fit)
 
-#Se puede aÒadir una columna con la direcciÛn del LogFC
+#Se puede a√±adir una columna con la direcci√≥n del LogFC
 res_diabetes$"UP/DOWN" <- "UP"
 res_diabetes$"UP/DOWN"[res_diabetes$log2FoldChange<0] <- "DOWN"
 
-#SelecciÛn de genes Diferencialmente Expresados (DESeq2 usa por defecto p.value 0.01)
+#Selecci√≥n de genes Diferencialmente Expresados (DESeq2 usa por defecto p.value 0.01)
 summary(res_diabetes, alpha = 0.05)
 
 #RESULTADOS DESeq2 
 #Obtener el data.frame con los resultados sin ordenar para guardar
 library(dplyr) #para usar operador pipe %>%
-library(tibble) #para usar funciÛn rownames_to_column()
+library(tibble) #para usar funci√≥n rownames_to_column()
 RES_DESeq<-as.data.frame(res_diabetes) %>% rownames_to_column("nsemble")
 head(RES_DESeq)
 dim(RES_DESeq)
@@ -118,7 +118,7 @@ head(RES_padj_DESeq)
 dim(RES_padj_DESeq)
 write.csv(x = RES_padj_DESeq, file = "DE_DESeq.csv", row.names = FALSE)
 
-#Identificar los genes m·s diferencialmente expresados, se ordenan seg˙n p
+#Identificar los genes m√°s diferencialmente expresados, se ordenan seg√∫n p
 significativos_0.05 <- head(res_diabetes[order(res_diabetes$padj),],n=2358)
 #Lista de genes significativos mediante DESeq2
 DGE_DESeq2 <- rownames(significativos_0.05)
@@ -142,7 +142,7 @@ RES_FC_DESeq = res_diabetes %>% as.data.frame() %>% arrange(log2FoldChange)%>% r
 head(RES_FC_DESeq)
 dim(RES_FC_DESeq)
 
-### 3. VisualizaciÛn gr·fica de los resultados:
+### 3. Visualizaci√≥n gr√°fica de los resultados:
 #Visualizar los resultados con grafica MA-Plot (plot differences versus averages for high-throughput data)
 jpeg('plotMA_DESeq2.png')
 plotMA(res_diabetes,alpha=0.01,main="DESeq2",ylim=c(-5.5,6.5))
@@ -150,12 +150,12 @@ dev.off()
 
 ################
 # distribution of adjusted p-values (de dyplr)
-jpeg("Histograma distribuciÛn p-valores ajustados.png")
+jpeg("Histograma distribuci√≥n p-valores ajustados.png")
 hist(res_diabetes$padj, col="lightblue", main = "Adjusted p-value distribution", xlab = "adjusted p-value")
 dev.off()
 
 # distribution of non-adjusted p-values
-jpeg("Histograma distribuciÛn p-valores sin ajustar.png")
+jpeg("Histograma distribuci√≥n p-valores sin ajustar.png")
 hist(res_diabetes$pvalue, col="grey", main = "Non-adjusted p-value distribution", xlab = "Non-adjusted p-value")
 dev.off()
 
