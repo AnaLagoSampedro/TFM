@@ -1,12 +1,12 @@
 ##################################################################
-############# Análisis Enriquecimiento Funcional ORA #############
+############# AnÃ¡lisis Enriquecimiento Funcional ORA #############
 #################### Proyecto GSE164416 ##########################
 ################# ANA MARIA LAGO SAMPEDRO ########################
 ##################################################################
 
-#A continuación del Script DGE_DESeq2.R, con los resultados obtenidos:
-#Este script de R describe la implementación de un análisis ORA usando 
-#el paquete clusterProfiler. Más información en:
+#A continuaciÃ³n del Script DGE_DESeq2.R, con los resultados obtenidos:
+#Este script de R describe la implementaciÃ³n de un anÃ¡lisis ORA usando 
+#el paquete clusterProfiler. MÃ¡s informaciÃ³n en:
 #https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html
 
 # Instalar y cargar paquetes:
@@ -36,7 +36,7 @@ df = read.csv("~path/DE_DESeq.csv", header=TRUE)
 original_gene_list <- df$log2FoldChange
 
 
-#Para enriquecimiento funcional términos GO:
+#Para enriquecimiento funcional tÃ©rminos GO:
 # Nombrar el vector con los genes correspondientes
 names(original_gene_list) <- df$nsemble
 # Omitir cualquier valor NA 
@@ -121,7 +121,7 @@ dotplot(go_enrich2, showCategory = 9, font.size=5, orderBy = "GeneRatio",
 #Para KEGG, WikiPathways, Reactome usa IDs de ENTREZ, hay que traducirlos:
 # Convertir gene IDs para enrichKEGG function
 head(original_gene_list)
-# Se perderán algunos genes porque no todos los IDs se convertirán
+# Se perderÃ¡n algunos genes porque no todos los IDs se convertirÃ¡n
 ids<-bitr(names(original_gene_list), fromType = "ENSEMBL", toType = "ENTREZID", OrgDb="org.Hs.eg.db")
 # eliminar IDs duplicados 
 dedup_ids = ids[!duplicated(ids[c("ENSEMBL")]),]
@@ -191,11 +191,11 @@ dotplot(kk2,
         font.size = 8)
 
 
-###Análisis enriquecimiento WikiPathways
-#WikiPathways es una base de datos continuamente en actualización por la comunidad de investigadores.
+###AnÃ¡lisis enriquecimiento WikiPathways
+#WikiPathways es una base de datos continuamente en actualizaciÃ³n por la comunidad de investigadores.
 #Organismos que soporta; 
 #get_wp_organisms()
-#Para el análisis de sobrerrepresentación con este;
+#Para el anÃ¡lisis de sobrerrepresentaciÃ³n con este;
 
 ###DOWN###
 wiki <- enrichWP(gene = kegg_genesDOWN, universe = names(kegg_gene_list), organism = "Homo sapiens")
