@@ -1,44 +1,44 @@
 ################################################################################
-############### Construcci髇 del fichero genes "genesANA.rds" ##################
-###################### para el aprendizaje autom醫ico ##########################
+############### Construcci贸n del fichero genes "genesANA.rds" ##################
+###################### para el aprendizaje autom谩tico ##########################
 ################################################################################
 
-# Establecer el directorio de trabajo (donde se guardar醤 los resultados)
+# Establecer el directorio de trabajo (donde se guardar谩n los resultados)
 setwd('~path/RESULTADOS')
 
 ## ------------------------------------------------------------------------
 
-### Construcci髇 del fichero genes ###
+### Construcci贸n del fichero genes ###
 #Necesario generar otro data.frame que contenga tres columnas, la primera con 
 #todos los identificadores de entrez, la segunda contiene solo aquellos genes 
-#que aparecen en hipathia y la tercera los que son genes diana de f醨macos
+#que aparecen en hipathia y la tercera los que son genes diana de f谩rmacos
 #aprobados en DrugBank filtrados (approved_targets).
 
-#Cargar librer韆s necesarias:
+#Cargar librer铆as necesarias:
 pacman::p_load("biomaRt", "org.Hs.eg.db", "magrittr", 
                "AnnotationDbi", "regexPipes","here")
 #Antes; 
-#Filtrar genes diana de f醨macos aprobados de DrugBank;
+#Filtrar genes diana de f谩rmacos aprobados de DrugBank;
 #Cargar base de datos descargada de DrugBank para filtrar aquellos genes diana
-#aprobados con acci髇 farmacol骻ica conocida
+#aprobados con acci贸n farmacol贸gica conocida
 data_folder <- "~path/FILES"
 fname <- "drugbank_drug-bindings_v5.1.8.tsv"
 fpath <-file.path(data_folder,fname)
 drugbank_alltar <- read.delim(file = fpath, sep = "\t")
-#Seleccionar aquellos f醨macos aprobados y que no contengan el tag "Withdrawn"
+#Seleccionar aquellos f谩rmacos aprobados y que no contengan el tag "Withdrawn"
 drugbank_approved <- drugbank_alltar[-(regexPipes::grep(drugbank_alltar$groups,
                                                         "withdrawn")),] %>% .[(regexPipes::grep(.$groups,
                                                                                                 "^approved|approved,")),] %>% .[(regexPipes::grep(.$drug_binding,
                                                                                                                                                   "target_gene")),]
-#La tuber韆 %>% pasa la salida del marco de datos que resulta de la funci髇 justo 
-#antes de la tuber韆 para ingresarla como el primer argumento de la funci髇 justo 
-#despu閟 de la tuber韆.
+#La tuber铆a %>% pasa la salida del marco de datos que resulta de la funci贸n justo 
+#antes de la tuber铆a para ingresarla como el primer argumento de la funci贸n justo 
+#despu茅s de la tuber铆a.
 #Y el punto hace referencia a la base de datos drugbank_alltar, pero la que sale 
 #del pipe anterior.
 #chequear los filtros para comprobar que ha ido bien
 which(table(drugbank_approved$groups) > 0)
 which(table(drugbank_approved$drug_binding) > 0 )
-#Seleccionar dianas aprobadas con acci髇 farmacol骻ica conocida
+#Seleccionar dianas aprobadas con acci贸n farmacol贸gica conocida
 drugbank_app_action <- drugbank_approved[(grep(drugbank_approved$pharmacological_action,"yes")),] %>% .[.$organism == "Humans",] %>% .[-which(is.na(.$entrez_id)),]
 #Chequear otra vez que los filtros han ido bien
 table(drugbank_app_action$pharmacological_action)
@@ -57,20 +57,20 @@ approved_targets<-unique(drugbank_app_action$entrez_id)
 
 
 #Para la primera columna del fichero "genesANA.rds", necesarios todos los ID de 
-#genes de entrez. Esto se hab韆 obtenido de GTEx tras la funci髇 translate_data() 
-#y se obten韆n 23664 genes (fichero obtenido en el script Script_GTEx_hipathia.R)
+#genes de entrez. Esto se hab铆a obtenido de GTEx tras la funci贸n translate_data() 
+#y se obten铆an 23664 genes (fichero obtenido en el script Script_GTEx_hipathia.R)
 genes <- readRDS("~path/genes_GTEx.rds")
 head(genes)
 dim(genes)
 #View(genes)
-#Generar el data.frame con la informaci髇 necesaria para el fichero genes.rds 
+#Generar el data.frame con la informaci贸n necesaria para el fichero genes.rds 
 #para la primera columna entrezs:
 entrezs<-genes$genes_GTEx
 genesANA<-as.data.frame(entrezs)
 #View(genesANA)
 #para la segunda columna "in_hipathia":
-#con la info de los genes de rutas fisiol骻icas que aparecen en hipathia en la 
-#opci髇 metaginfo$all.genes, obtenido del proyecto GTEx, sale todo lo que hay en 
+#con la info de los genes de rutas fisiol贸gicas que aparecen en hipathia en la 
+#opci贸n metaginfo$all.genes, obtenido del proyecto GTEx, sale todo lo que hay en 
 #hipathia (fichero obtenido en el script Script_GTEx_hipathia.R)
 in_hipathia <- readRDS("~path/genes_hipathia.rds")
 head(in_hipathia)
@@ -79,7 +79,7 @@ genesANA$in_hipathia <- as.integer(genesANA$entrezs %in% in_hipathia$`metaginfo$
 genesANA$in_hipathia[genesANA$in_hipathia==1]<-"TRUE"
 genesANA$in_hipathia[genesANA$in_hipathia==0]<-"FALSE"
 #para la tercera columna "approved_targets":
-#con la info de los genes diana de f醨macos aprobados en la lista approved_targets 
+#con la info de los genes diana de f谩rmacos aprobados en la lista approved_targets 
 head(approved_targets)
 dim(as.data.frame(approved_targets))
 genesANA$approved_targets <- as.integer(genesANA$entrezs %in% approved_targets)
@@ -92,7 +92,7 @@ table(genesANA$approved_targets)
 #Guardar este fichero genes, como rds y feather.
 write.table(genesANA, file = "genesANA.txt",sep = "\t", row.names = FALSE, col.names = TRUE)
 saveRDS(genesANA, file = "genesANA.rds")
-#Conversi髇 a .feather
+#Conversi贸n a .feather
 #install.packages("feather", repos = "http://cran.us.r-project.org")
 library(feather)
 write_feather(genesANA, path = "genesANA.feather")
