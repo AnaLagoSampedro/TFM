@@ -7,6 +7,7 @@ Curso 2020-2021
 
 Resumen del trabajo:
 
+El avance en la tecnología aplicada a la Genómica ha supuesto un incremento en la cantidad de información obtenida que la llevó a ser considerada una disciplina más del Big Data y un escenario ideal para la aplicación de técnicas Machine Learning (ML). Debido a la naturaleza multigénica de enfermedades complejas como la Diabetes tipo 2 (DM2), es interesante enfocar su estudio como consecuencia de fallos en complejos módulos funcionales (o rutas de señalización metabólicas) causados por alteraciones en la actividad de los genes codificantes de proteínas interconectadas que los constituyen. Empleando novedosos modelos mecanicistas en combinación con estrategias ML se pueden explorar estos módulos a partir de datos de expresión génica para modelar el mapa mecanicista de la DM2 que señale aquellos circuitos (entendidos como sub-rutas) desregulados en la enfermedad y descubrir mediante aprendizaje automático, empleando grandes bases de datos de expresión génica de tejidos sanos, nuevos enfoques terapéuticos al aprender y predecir el impacto de genes diana de fármacos conocidos (KDTs) aprobados sobre esos circuitos y aplicar este conocimiento para el reposicionamiento de fármacos.
 
 
 
