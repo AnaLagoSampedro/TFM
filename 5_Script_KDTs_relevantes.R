@@ -1,13 +1,13 @@
 ##############################################################################
-################## ObtenciÛn KDTs relevantes y f·rmacos  #####################
-######## An·lisis de enriquecimiento funcional de esos KDTs relevantes #######
+################## Obtenci√≥n KDTs relevantes y f√°rmacos  #####################
+######## An√°lisis de enriquecimiento funcional de esos KDTs relevantes #######
 ########################### ANA LAGO SAMPEDRO ################################
 ##############################################################################
 
-# Establecer el directorio de trabajo (donde se guardar·n los resultados)
+# Establecer el directorio de trabajo (donde se guardar√°n los resultados)
 setwd('~path/RESULTADOS')
 
-#Cargar librerÌas necesarias
+#Cargar librer√≠as necesarias
 pacman::p_load("here", "rentrez","reutils","hipathia", "biomaRt", "utils", 
                "stringr", "AnnotationDbi", "org.Hs.eg.db",
                "dplyr","tidyr", "openxlsx", "data.table", "scales", 
@@ -23,7 +23,7 @@ rownames(stability) <-stability$V1
 stability <- stability[-1,-1]
 stability[is.na(stability)] = 0
 
-#Cargar la matriz de puntuaciones de relevancias con la matriz delumbral de selecciÛn para filtrar
+#Cargar la matriz de puntuaciones de relevancias con la matriz delumbral de selecci√≥n para filtrar
 shap_entrez <-  fread(file = file.path(data_folder,"shap_summary_symbol.tsv"), 
                       header = T) %>% as.data.frame()
 #View(shap_entrez)
@@ -48,7 +48,7 @@ write.table(shap_relevant_stable2, "Shap_relevant_stable.tsv", row.names = FALSE
 
 #Primero hay que reescalar por circuito (filas) cada matriz SHAP para hacer el circuito comparable
 mat <- as.data.frame(t(apply(shap_relevant_stable, 1, function(x) x/max(abs(x))))) 
-#AsÌ, reescala los valores de puntuaciÛn para que estÈn en escala -1,1
+#As√≠, reescala los valores de puntuaci√≥n para que est√©n en escala -1,1
 #View(mat)
 
 #Con esta matriz mat se hace el heatmap:
@@ -60,7 +60,7 @@ aheatmap(mat, scale = "col", legend = TRUE, cellwidth = 10, cellheight = 5,
 
 
 #Ahora con los KDTs de entrez o Symbols puedo buscar las drogas en el .tsv de DrugBank:
-#Ordenarla para sacar la lista de KDTs que afectan de m·s circuitos a menos:
+#Ordenarla para sacar la lista de KDTs que afectan de m√°s circuitos a menos:
 ## Subset  solo los valores Shap que son relevantes para al menos un circuito.
 KDTs <- threshold_entrez_stable[,(apply(threshold_entrez_stable, 2, function(y) any(y == 1)))]
 dim(KDTs) #155 circuitos y 121 KDTs relevantes
@@ -84,27 +84,27 @@ drug_bank = "~path/FILES"
 ## Cargar el fichero con todos los KDTs y sus drogas ### 
 drugs <- fread(file = file.path(drug_bank, "drugbank_drug-bindings_v5.1.8.tsv")) %>% as.data.frame(.)
 View(drugs)
-#Filtrar KDTs para f·rmacos aprobados de humanos:
+#Filtrar KDTs para f√°rmacos aprobados de humanos:
 
-#Cargar librerÌas necesarias;
+#Cargar librer√≠as necesarias;
 pacman::p_load("biomaRt", "org.Hs.eg.db", "magrittr", 
                "AnnotationDbi", "regexPipes","here")
 
-#Seleccionar aquellos f·rmacos aprobados y que no contengan el tag "Withdrawn"
+#Seleccionar aquellos f√°rmacos aprobados y que no contengan el tag "Withdrawn"
 drugbank_approved <- drugs[-(regexPipes::grep(drugs$groups,
                                                         "withdrawn")),] %>% .[(regexPipes::grep(.$groups,
                                                                                                 "^approved|approved,")),] %>% .[(regexPipes::grep(.$drug_binding,
                                                                                                                                                   "target_gene")),]                                                                                             
                                                                                                 
-#La tuberÌa %>% pasa la salida del marco de datos que resulta de la funciÛn justo 
-#antes de la tuberÌa para ingresarla como el primer argumento de la funciÛn justo 
-#despuÈs de la tuberÌa.
+#La tuber√≠a %>% pasa la salida del marco de datos que resulta de la funci√≥n justo 
+#antes de la tuber√≠a para ingresarla como el primer argumento de la funci√≥n justo 
+#despu√©s de la tuber√≠a.
 #Y el punto hace referencia a la base de datos drugbank_alltar, pero la que sale 
 #del pipe anterior.
 #chequear los filtros para comprobar que ha ido bien
 which(table(drugbank_approved$groups) > 0)
 which(table(drugbank_approved$drug_binding) > 0 )
-#Seleccionar dianas aprobadas con acciÛn farmacolÛgica conocida
+#Seleccionar dianas aprobadas con acci√≥n farmacol√≥gica conocida
 drugbank_app_action <- drugbank_approved[(grep(drugbank_approved$pharmacological_action,"yes")),] %>% .[.$organism == "Humans",] %>% .[-which(is.na(.$entrez_id)),]
 #View(drugbank_app_action)
 #Chequear otra vez que los filtros han ido bien
@@ -135,7 +135,7 @@ for(i in 1:length(list_KDTs)){
 }
 View(Drugs_KDTs)
 length(unique(Drugs_KDTs$gene_name)) #120 KDTs
-length(unique(Drugs_KDTs$drug_id))  #348 f·rmacos
+length(unique(Drugs_KDTs$drug_id))  #348 f√°rmacos
 
 write.table(Drugs_KDTs, "Drugs_KDTs.tsv",sep = "\t", row.names = FALSE)
 ##############################################################################
@@ -153,21 +153,21 @@ KDTs<-list_KDTs
 ### GO enrichment analysis ###
 #GO comprende 3 ontologias ortogonales (MF molecular function; BP biological process;
 #CC cellular component).
-#Los an·lisis GO (groupGO, enrichGO y gseGO) para organismos en el objeto OrgDb, como Humano.
+#Los an√°lisis GO (groupGO, enrichGO y gseGO) para organismos en el objeto OrgDb, como Humano.
 #Si tenemos datos GOannotation en data.frame con primera columna ID de genes
 #y segunda columna con ID de GO, se puede usar las funciones enricher() y gseGO() para
-#obtener test de sobrerrepresentaciÛn y analisis de enriquecimiento de un set de genes.
+#obtener test de sobrerrepresentaci√≥n y analisis de enriquecimiento de un set de genes.
 
-#ClasificaciÛn GO:
-#En clusterProfiler, la funciÛn groupGO() est· diseÒada pra clasificaciÛn de genes basada en 
-#distribuciÛn GO a un nivel especÌfico.
+#Clasificaci√≥n GO:
+#En clusterProfiler, la funci√≥n groupGO() est√° dise√±ada pra clasificaci√≥n de genes basada en 
+#distribuci√≥n GO a un nivel espec√≠fico.
 library(clusterProfiler)
 library(org.Hs.eg.db)
 
 #Con ClusterProfiler voy a hacer clasificacion GO de esos efectores:
 
 ### GO over-representation analysis (ORA) ###
-#La funciÛn enrichGO() para hacer el test de sobrerrepresentaciÛn de gene ontology
+#La funci√≥n enrichGO() para hacer el test de sobrerrepresentaci√≥n de gene ontology
 # Convert gene IDs to ENTREZID
 # We will lose some genes here because not all IDs will be converted
 ids<-bitr(KDTs, fromType = "SYMBOL", toType = "ENTREZID", OrgDb="org.Hs.eg.db")
@@ -177,7 +177,7 @@ dim(ids)
 dedup_ids = ids[!duplicated(ids[c("SYMBOL")]),]
 dim(dedup_ids)
 
-#Analisis de sobrerrepresentaciÛn de GO
+#Analisis de sobrerrepresentaci√≥n de GO
 go_enrich <- enrichGO(gene = dedup_ids$ENTREZID, keyType = "ENTREZID", OrgDb = org.Hs.eg.db, ont = "all",
                       pAdjustMethod = "BH", pvalueCutoff = 0.05, qvalueCutoff = 0.1, readable = TRUE, pool = FALSE)
 #View(as.data.frame(go_enrich))
@@ -195,11 +195,11 @@ barplot(go_enrich, split="ONTOLOGY",
 dotplot(go_enrich, showCategory = 10, title = "GO Biological Proccess", font.size=5, orderBy = "GeneRatio", 
         split="ONTOLOGY")+ facet_grid(ONTOLOGY~., scale="free")
 
-###An·lisis WikiPathways
-#WikiPathways es una base de datos continuamente en actualizaciÛn por la comunidad de investigadores.
+###An√°lisis WikiPathways
+#WikiPathways es una base de datos continuamente en actualizaci√≥n por la comunidad de investigadores.
 #Organismos que soporta; 
 #get_wp_organisms()
-#Para el an·lisis de sobrerrepresentaciÛn con este;
+#Para el an√°lisis de sobrerrepresentaci√≥n con este;
 wiki <- enrichWP(dedup_ids$ENTREZID, organism = "Homo sapiens")
 head(wiki,20)
 dim(wiki)
@@ -212,7 +212,7 @@ dotplot(wiki, showCategory = 10,
         font.size = 7, orderBy = "GeneRatio")
 
 ###REACTOME
-#ReactomePA est· diseÒada para an·lisis basado en rutas curadas de reactoma. Emplea modelo hipergeomÈtrico para el an·lisis de sobrerrepresentaciÛn de genes. Hace correcciÛn FDR.
+#ReactomePA est√° dise√±ada para an√°lisis basado en rutas curadas de reactoma. Emplea modelo hipergeom√©trico para el an√°lisis de sobrerrepresentaci√≥n de genes. Hace correcci√≥n FDR.
 #BiocManager::install("ReactomePA")
 library(ReactomePA)
 react <- enrichPathway(gene = dedup_ids$ENTREZID, 
